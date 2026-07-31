@@ -1,0 +1,22 @@
+# Python
+.venv/
+__pycache__/
+*.pyc
+.ipynb_checkpoints/
+.DS_Store
+
+# Raw GDC data is huge. Keep folder placeholders only.
+data/raw/**
+!data/raw/
+!data/raw/**/
+!data/raw/**/.gitkeep
+
+# Model binaries can be regenerated.
+results/models/*
+!results/models/.gitkeep
+*.pt
+*.pth
+*.joblib
+
+# Optional local notebook execution outputs
+notebooks/executed/

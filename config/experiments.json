@@ -1,0 +1,126 @@
+{
+  "experiment_1_standard_mlp": {
+    "experiment_name": "exp01_standard_mlp",
+    "model_family": "standard_mlp",
+    "hidden_dims": [
+      256,
+      128,
+      64
+    ],
+    "dropout": 0.2,
+    "batch_norm": true,
+    "learning_rate": 0.001,
+    "weight_decay": 0.0001,
+    "batch_size": 64,
+    "epochs": 120,
+    "patience": 20
+  },
+  "experiment_2_dropout_comparison": [
+    {
+      "experiment_name": "exp02_mlp_no_dropout",
+      "model_family": "standard_mlp",
+      "hidden_dims": [
+        256,
+        128,
+        64
+      ],
+      "dropout": 0.0,
+      "batch_norm": true,
+      "learning_rate": 0.001,
+      "weight_decay": 0.0001,
+      "batch_size": 64,
+      "epochs": 120,
+      "patience": 20
+    },
+    {
+      "experiment_name": "exp02_mlp_dropout_20",
+      "model_family": "standard_mlp",
+      "hidden_dims": [
+        256,
+        128,
+        64
+      ],
+      "dropout": 0.2,
+      "batch_norm": true,
+      "learning_rate": 0.001,
+      "weight_decay": 0.0001,
+      "batch_size": 64,
+      "epochs": 120,
+      "patience": 20
+    },
+    {
+      "experiment_name": "exp02_mlp_dropout_40",
+      "model_family": "standard_mlp",
+      "hidden_dims": [
+        256,
+        128,
+        64
+      ],
+      "dropout": 0.4,
+      "batch_norm": true,
+      "learning_rate": 0.001,
+      "weight_decay": 0.0001,
+      "batch_size": 64,
+      "epochs": 120,
+      "patience": 20
+    }
+  ],
+  "experiment_3_batchnorm_comparison": [
+    {
+      "experiment_name": "exp03_mlp_no_batchnorm",
+      "model_family": "standard_mlp",
+      "hidden_dims": [
+        256,
+        128,
+        64
+      ],
+      "dropout": 0.2,
+      "batch_norm": false,
+      "learning_rate": 0.001,
+      "weight_decay": 0.0001,
+      "batch_size": 64,
+      "epochs": 120,
+      "patience": 20
+    },
+    {
+      "experiment_name": "exp03_mlp_with_batchnorm",
+      "model_family": "standard_mlp",
+      "hidden_dims": [
+        256,
+        128,
+        64
+      ],
+      "dropout": 0.2,
+      "batch_norm": true,
+      "learning_rate": 0.001,
+      "weight_decay": 0.0001,
+      "batch_size": 64,
+      "epochs": 120,
+      "patience": 20
+    }
+  ],
+  "experiment_4_residual_mlp": {
+    "experiment_name": "exp04_residual_mlp",
+    "model_family": "residual_mlp",
+    "hidden_dim": 128,
+    "num_blocks": 3,
+    "dropout": 0.2,
+    "learning_rate": 0.001,
+    "weight_decay": 0.0001,
+    "batch_size": 64,
+    "epochs": 120,
+    "patience": 20
+  },
+  "experiment_5_multibranch_multitask": {
+    "experiment_name": "exp05_multibranch_multitask",
+    "model_family": "multibranch_multitask",
+    "branch_hidden_dim": 64,
+    "fusion_hidden_dim": 128,
+    "dropout": 0.2,
+    "learning_rate": 0.001,
+    "weight_decay": 0.0001,
+    "batch_size": 64,
+    "epochs": 120,
+    "patience": 20
+  }
+}
