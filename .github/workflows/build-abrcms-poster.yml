@@ -4,8 +4,6 @@ on:
   push:
     paths:
       - 'poster/source/*.pptx'
-      - 'scripts/update_abrcms_poster.py'
-      - '.github/workflows/build-abrcms-poster.yml'
   workflow_dispatch:
 
 permissions:
