@@ -1,0 +1,39 @@
+name: Build editable ABRCMS poster
+
+on:
+  push:
+    paths:
+      - 'poster/source/*.pptx'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  poster:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: python -m pip install python-pptx 'qrcode[pil]'
+      - name: Generate editable poster
+        run: |
+          test -f 'poster/source/UNC_ABRCMS_4_Column(1).pptx' || {
+            echo 'Missing original poster in poster/source. Upload it before rerunning.'; exit 1;
+          }
+          python scripts/update_abrcms_poster.py \
+            'poster/source/UNC_ABRCMS_4_Column(1).pptx' \
+            'poster/UNC_ABRCMS_4_Column_QR_Expanded_Findings.pptx'
+      - name: Commit updated PowerPoint
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add 'poster/UNC_ABRCMS_4_Column_QR_Expanded_Findings.pptx'
+          if ! git diff --staged --quiet; then
+            git commit -m "Generate updated ABRCMS poster with QR and expanded findings"
+            git push
+          fi
