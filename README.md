@@ -1,142 +1,63 @@
-# TCGA TAA Deep Learning Pipeline — Notebook Edition
+# TCGA Tumor-Associated Antigen RNA Prediction
 
-This repository contains a Jupyter-notebook-based deep learning pipeline for predicting tumor-associated antigen (TAA) RNA expression from TCGA multi-omic features.
+**Biology first, modeling as the tool.** This project investigates whether **non-RNA tumor features** predict expression of ten tumor-associated antigen (TAA) genes across ten TCGA cancer cohorts.
 
-The project is intentionally deep-learning focused. It evaluates neural network architectures rather than treating linear/logistic regression as the center of the project.
+RNA sequencing (**RNA-seq**) provides the **observed response labels** (log2[TPM+1] TAA RNA expression); it is **not** used as an input feature. Inputs comprise cancer type and clinical annotations, DNA-derived copy number, and somatic mutation calls.
 
-## Project goal
+## Biological questions
 
-Predict RNA expression for 10 TAA genes:
+1. Which TAA transcripts are relatively enriched in specific cancer cohorts?
+2. How much does TAA expression vary among tumors within the same cancer type?
+3. Which non-RNA feature groups have predictive associations with specific TAAs?
+4. Which TAA RNA expression patterns can the neural network reproduce on held-out tumor samples?
 
-```text
-ERBB2, FOLR1, MUC16, CD276, NECTIN4, TACSTD2, CLDN6, EPCAM, MSLN, MUC1
-```
+Targets: `ERBB2`, `FOLR1`, `MUC16`, `CD276`, `NECTIN4`, `TACSTD2`, `CLDN6`, `EPCAM`, `MSLN`, `MUC1`.
 
-from:
+Cohorts: TCGA-BRCA, OV, UCEC, LUAD, LUSC, BLCA, HNSC, STAD, COAD and READ.
 
-```text
-clinical/cancer type features + mutation features + gene-level copy-number features
-```
+## Notebook roadmap
 
-## Experiments
+| Notebook | Purpose |
+| --- | --- |
+| `00_Project_Overview.ipynb` | Study objectives |
+| `00_Project_Setup_and_Validation.ipynb` | Environment and input checks |
+| `01_Data_Processing_Pipeline.ipynb` | Optional raw GDC-to-modeling table pipeline |
+| `02_Experiment_1_Standard_MLP.ipynb` | Standard multilayer perceptron |
+| `03_Experiment_2_Dropout_Comparison.ipynb` | Regularization/dropout comparisons |
+| `04_Experiment_3_BatchNorm_Comparison.ipynb` | Batch-normalization comparison |
+| `05_Experiment_4_Residual_MLP.ipynb` | Residual architecture |
+| `06_Experiment_5_MultiBranch_MultiTask.ipynb` | Multi-branch model |
+| **`07_Deep_Learning_Results.ipynb`** | **Model metrics, per-target R² and validation loss** |
+| **`08_Run_All_Notebooks.ipynb`** | **Connected runner: reports / train / full** |
+| **`09_Feature_Group_Ablation.ipynb`** | **Retrain one multi-output MLP with five feature subsets** |
+| **`10_Biological_Results.ipynb`** | **Five biological displays: mean and relative TAA expression; heterogeneity; ablation; observed vs predicted** |
+| **`11_Export_Results_Tables.ipynb`** | **CSV and optional Excel reporting** |
+| `_Shared_Training_Utilities.ipynb` | Common training functions |
 
-| Experiment | Notebook | Purpose |
-|---|---|---|
-| 1 | `02_Experiment_1_Standard_MLP.ipynb` | Baseline feedforward neural network |
-| 2 | `03_Experiment_2_Dropout_Comparison.ipynb` | Dropout/no-dropout regularization comparison |
-| 3 | `04_Experiment_3_BatchNorm_Comparison.ipynb` | Batch normalization vs no batch normalization |
-| 4 | `05_Experiment_4_Residual_MLP.ipynb` | Residual MLP with skip connections |
-| 5 | `06_Experiment_5_MultiBranch_MultiTask.ipynb` | Multi-branch, multi-task model with clinical, mutation, and copy-number branches |
+## Quick start
 
-## Expected data layout
+1. Clone the repository and install `requirements.txt` in a Python environment.
+2. Open Jupyter in VS Code; choose a kernel using that environment.
+3. Use the already-tracked `data/processed/modeling_table.csv` for analysis, without downloading raw TCGA files.
+4. Open `notebooks/08_Run_All_Notebooks.ipynb`. Set `MODE = "reports"` to render figures using existing saved model outputs. Missing prediction or ablation CSVs are reported without inventing results.
+5. Set `MODE = "train"` to run all model comparisons, regenerate a **corrected ablation analysis**, and then render reports. `MODE = "full"` additionally executes the raw pipeline and requires the full raw GDC dataset.
 
-Raw data is **not included** in this repo because the GDC download is very large.
+The runner saves executed notebook copies under `notebooks/executed/`. Outputs are written under `reports/` and `results/`. No raw data are committed by the revised workflow.
 
-After adding your data, the repo should look like this:
+## Scientific cautions
 
-```text
-tcga-taa-deep-learning/
-  data/
-    raw/
-      copy_number/
-        files/
-        download_info/
-      mutation/
-        files/
-        download_info/
-      clinical/
-        biospecimen.cart.2026-07-09/
-        clinical.cart.2026-07-09/
-      rna_expression/
-        files/
-        download_info/
-    processed/
-```
+- RNA abundance is **not** measured cell-surface protein density or treatment response.
+- Feature-group ablation compares predictive information from different modality subsets; **it is not evidence of causality**.
+- Relative heatmaps are normalized separately for each gene, and must not be read as an absolute cross-gene comparison.
+- If the earlier ablation code inadvertently used cohort identifier columns in gene-only models, **rerun notebook 09** before making conclusions from those legacy ablation plots.
+- Shared train/validation/test splits, train-only imputation/scaling, and repeated independent evaluation remain important. Model superiority has not been established from a single random split alone.
 
-The code assumes this structure but does not require hardcoded Mac paths.
+More details are in [Scientific interpretation](docs/SCIENTIFIC_INTERPRETATION.md).
 
-## Important GitHub note
+## Original files preserved
 
-Do **not** commit the 40GB raw GDC data to GitHub. This repo's `.gitignore` excludes `data/raw/**`.
+The original combined metrics/biology notebook, original run-all notebook and original README are copied to `archive/pre-report-split/`. Git history also retains prior commits. The new organization is proposed through a **draft pull request**; `main` remains unchanged until you merge.
 
-For GitHub/class submission, include code and notebooks. Locally, add raw data under `data/raw/` before running data processing.
+### Data provenance
 
-## Setup
-
-From the repository root:
-
-```bash
-python3 -m venv .venv
-source .venv/bin/activate
-
-pip install --upgrade pip
-pip install -r requirements.txt
-```
-
-Start Jupyter from the repo root:
-
-```bash
-jupyter notebook
-```
-
-## How to run
-
-Run notebooks in this order:
-
-```text
-00_Project_Setup_and_Validation.ipynb
-01_Data_Processing_Pipeline.ipynb
-02_Experiment_1_Standard_MLP.ipynb
-03_Experiment_2_Dropout_Comparison.ipynb
-04_Experiment_3_BatchNorm_Comparison.ipynb
-05_Experiment_4_Residual_MLP.ipynb
-06_Experiment_5_MultiBranch_MultiTask.ipynb
-07_Results_Excel_and_Visuals.ipynb
-```
-
-The shared training/modeling code is in:
-
-```text
-notebooks/_Shared_Training_Utilities.ipynb
-```
-
-Each experiment notebook loads this shared notebook with `%run` logic.
-
-## Output folders
-
-```text
-data/processed/
-  modeling_table.csv
-  rna_taa_case_level.csv
-  copy_number_case_level.csv
-  mutation_case_level.csv
-  clinical_features_case_level.csv
-
-results/
-  metrics/
-  predictions/
-  histories/
-  configs/
-  models/
-
-reports/
-  figures/
-  tcga_taa_experiment_summary.xlsx
-```
-
-## Re-running experiments only
-
-If `data/processed/modeling_table.csv` already exists, you can skip raw data processing and run only the experiment notebooks.
-
-## Course-module alignment
-
-This project directly connects to:
-
-- Feedforward neural networks
-- Backpropagation
-- Regularization
-- Batch normalization
-- Residual connections
-- Representation learning
-- Multi-task learning
-- Biologically motivated multi-branch neural networks
+Source: TCGA/GDC public data. RNA-seq supplies the TAA expression target values; copy-number and somatic mutation features are DNA-derived. No patient-level protein, clinical response, or experimental validation is claimed.
